@@ -1,67 +1,49 @@
 package com.gestionstages.model.entity;
 
+import com.gestionstages.model.enums.RoleEnum;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "utilisateurs")
+@Table(name = "utilisateur")
 @Inheritance(strategy = InheritanceType.JOINED)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class Utilisateur {
+public class Utilisateur {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Email est obligatoire")
-    @Email(message = "Format email invalide")
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 255)
     private String email;
 
-    @NotBlank(message = "Mot de passe est obligatoire")
-    @Size(min = 8, message = "Le mot de passe doit contenir au moins 8 caractères")
-    @Column(nullable = false)
+    @Column(nullable = false, name = "mot_de_passe")
     private String motDePasse;
 
-    @NotBlank(message = "Nom est obligatoire")
-    @Size(min = 2, max = 100, message = "Le nom doit contenir entre 2 et 100 caractères")
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String nom;
 
-    @NotBlank(message = "Prénom est obligatoire")
-    @Size(min = 2, max = 100, message = "Le prénom doit contenir entre 2 et 100 caractères")
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String prenom;
 
-    @Size(max = 20, message = "Le téléphone ne peut pas dépasser 20 caractères")
+    @Column(length = 20)
     private String telephone;
 
-    @NotBlank(message = "Role est obligatoire")
-    @Column(nullable = false)
-    private String role;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private RoleEnum role;
 
-    @Column(nullable = false, updatable = false)
+    @CreationTimestamp
+    @Column(name = "date_creation", updatable = false)
     private LocalDateTime dateCreation;
 
-    @NotNull(message = "Le statut actif est obligatoire")
     @Column(nullable = false)
     private Boolean actif = true;
-
-    @PrePersist
-    protected void onCreate() {
-        dateCreation = LocalDateTime.now();
-        if (actif == null) {
-            actif = true;
-        }
-    }
 }

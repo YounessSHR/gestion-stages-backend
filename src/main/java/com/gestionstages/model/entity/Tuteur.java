@@ -1,8 +1,6 @@
 package com.gestionstages.model.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,19 +10,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "tuteurs")
+@Table(name = "tuteur")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Tuteur extends Utilisateur {
 
-    @NotBlank(message = "Département est obligatoire")
-    @Size(max = 100, message = "Le département ne peut pas dépasser 100 caractères")
+    @Column(length = 100)
     private String departement;
 
-    @NotBlank(message = "Spécialité est obligatoire")
-    @Size(max = 150, message = "La spécialité ne peut pas dépasser 150 caractères")
+    @Column(length = 100)
     private String specialite;
 
     @OneToMany(mappedBy = "tuteur", cascade = CascadeType.ALL)

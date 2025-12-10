@@ -1,7 +1,9 @@
 package com.gestionstages.repository;
 
-import com.gestionstages.model.entity.OffreStage;
 import com.gestionstages.model.entity.Entreprise;
+import com.gestionstages.model.entity.OffreStage;
+import com.gestionstages.model.enums.StatutOffreEnum;
+import com.gestionstages.model.enums.TypeOffreEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,29 +15,21 @@ import java.util.List;
 @Repository
 public interface OffreStageRepository extends JpaRepository<OffreStage, Long> {
 
+    List<OffreStage> findByStatut(StatutOffreEnum statut);
+
     List<OffreStage> findByEntreprise(Entreprise entreprise);
 
-    List<OffreStage> findByStatut(String statut);
+    List<OffreStage> findByTypeOffre(TypeOffreEnum typeOffre);
 
-    List<OffreStage> findByTypeOffre(String typeOffre);
+    @Query("SELECT o FROM OffreStage o WHERE o.statut = :statut AND o.dateExpiration > :date")
+    List<OffreStage> findActiveOffresByStatut(
+            @Param("statut") StatutOffreEnum statut,
+            @Param("date") LocalDate date
+    );
 
-    List<OffreStage> findByStatutAndTypeOffre(String statut, String typeOffre);
+    @Query("SELECT o FROM OffreStage o WHERE o.statut = 'VALIDEE' " +
+            "AND (o.dateExpiration IS NULL OR o.dateExpiration > CURRENT_DATE)")
+    List<OffreStage> findAllValidOffres();
 
-    @Query("SELECT o FROM OffreStage o WHERE o.statut = 'VALIDEE' AND o.dateExpiration > :currentDate")
-    List<OffreStage> findOffresValides(@Param("currentDate") LocalDate currentDate);
-
-    @Query("SELECT o FROM OffreStage o WHERE o.entreprise.id = :entrepriseId AND o.statut = :statut")
-    List<OffreStage> findByEntrepriseIdAndStatut(@Param("entrepriseId") Long entrepriseId, @Param("statut") String statut);
-
-    @Query("SELECT o FROM OffreStage o WHERE LOWER(o.titre) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(o.description) LIKE LOWER(CONCAT('%', :keyword, '%'))")
-    List<OffreStage> searchByKeyword(@Param("keyword") String keyword);
-
-    @Query("SELECT o FROM OffreStage o WHERE o.statut = 'VALIDEE' AND o.dateExpiration > :currentDate AND o.typeOffre = :type")
-    List<OffreStage> findOffresValidesParType(@Param("currentDate") LocalDate currentDate, @Param("type") String type);
-
-    @Query("SELECT COUNT(o) FROM OffreStage o WHERE o.entreprise.id = :entrepriseId")
-    Long countByEntrepriseId(@Param("entrepriseId") Long entrepriseId);
-
-    @Query("SELECT o FROM OffreStage o WHERE o.dateExpiration < :currentDate AND o.statut = 'VALIDEE'")
-    List<OffreStage> findOffresExpirees(@Param("currentDate") LocalDate currentDate);
+    List<OffreStage> findByTitreContainingIgnoreCase(String titre);
 }

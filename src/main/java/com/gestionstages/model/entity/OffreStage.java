@@ -1,18 +1,21 @@
 package com.gestionstages.model.entity;
 
+import com.gestionstages.model.enums.StatutOffreEnum;
+import com.gestionstages.model.enums.TypeOffreEnum;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "offres_stage")
+@Table(name = "offre_stage")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,56 +25,46 @@ public class OffreStage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Titre est obligatoire")
-    @Size(min = 5, max = 200, message = "Le titre doit contenir entre 5 et 200 caractères")
     @Column(nullable = false)
     private String titre;
 
-    @NotBlank(message = "Description est obligatoire")
-    @Size(min = 20, max = 10000, message = "La description doit contenir entre 20 et 10000 caractères")
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @NotBlank(message = "Type d'offre est obligatoire")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type_offre", nullable = false)
+    private TypeOffreEnum typeOffre;
+
     @Column(nullable = false)
-    private String typeOffre;
+    private Integer duree; // en mois
 
-    @Min(value = 1, message = "La durée doit être au moins de 1 mois")
-    @Max(value = 24, message = "La durée ne peut pas dépasser 24 mois")
-    private Integer duree;
-
-    @Future(message = "La date de début doit être dans le futur")
+    @Column(name = "date_debut", nullable = false)
     private LocalDate dateDebut;
 
-    @Future(message = "La date de fin doit être dans le futur")
+    @Column(name = "date_fin", nullable = false)
     private LocalDate dateFin;
 
-    @Size(max = 1000, message = "Les compétences requises ne peuvent pas dépasser 1000 caractères")
+    @Column(name = "competences_requises", columnDefinition = "TEXT")
     private String competencesRequises;
 
-    @Min(value = 0, message = "La rémunération doit être positive")
-    private Double remuneration;
+    @Column(precision = 10, scale = 2)
+    private BigDecimal remuneration;
 
-    @NotNull(message = "L'entreprise est obligatoire")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "entreprise_id", nullable = false)
     private Entreprise entreprise;
 
-    @NotBlank(message = "Statut est obligatoire")
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String statut;
+    private StatutOffreEnum statut = StatutOffreEnum.EN_ATTENTE;
 
+    @CreationTimestamp
+    @Column(name = "date_publication", updatable = false)
     private LocalDateTime datePublication;
 
+    @Column(name = "date_expiration")
     private LocalDate dateExpiration;
 
     @OneToMany(mappedBy = "offre", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Candidature> candidatures = new ArrayList<>();
-
-    @PrePersist
-    protected void onCreate() {
-        if (statut == null || statut.isEmpty()) {
-            statut = "BROUILLON";
-        }
-    }
 }
