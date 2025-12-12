@@ -2,7 +2,6 @@ package com.gestionstages.model.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -12,7 +11,6 @@ import lombok.NoArgsConstructor;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-@AllArgsConstructor
 public class Administration extends Utilisateur {
     // Pas de champs supplémentaires pour l'instant
 }
