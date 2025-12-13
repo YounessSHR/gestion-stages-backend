@@ -1,10 +1,34 @@
-HELP.md
+# ============================================
+# Maven
+# ============================================
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.properties
 
-### STS ###
+# ============================================
+# IDE - IntelliJ IDEA
+# ============================================
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+.idea_modules/
+atlassian-ide-plugin.xml
+
+# ============================================
+# IDE - Eclipse / STS
+# ============================================
 .apt_generated
 .classpath
 .factorypath
@@ -12,14 +36,13 @@ target/
 .settings
 .springBeans
 .sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
+# ============================================
+# IDE - NetBeans
+# ============================================
 /nbproject/private/
 /nbbuild/
 /dist/
@@ -29,5 +52,97 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
+# ============================================
+# IDE - VS Code
+# ============================================
 .vscode/
+*.code-workspace
+
+# ============================================
+# Sensitive Configuration Files
+# ============================================
+# DO NOT commit application.properties with real secrets
+# Use application.properties.example as template
+src/main/resources/application.properties
+src/main/resources/application-local.properties
+src/main/resources/application-prod.properties
+*.env
+.env
+.env.local
+.env.production
+
+# ============================================
+# Logs
+# ============================================
+*.log
+logs/
+*.log.*
+*.gz
+*.zip
+.cursor/
+.cursor/**
+debug.log
+*.log.*
+
+# ============================================
+# Uploaded Files
+# ============================================
+uploads/
+**/uploads/**
+uploads/**
+!uploads/.gitkeep
+
+# ============================================
+# OS Files
+# ============================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.swp
+*.swo
+*~
+.directory
+
+# ============================================
+# Temporary Files
+# ============================================
+*.tmp
+*.temp
+*.bak
+*.backup
+*.cache
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+
+# ============================================
+# Database
+# ============================================
+*.db
+*.sqlite
+*.sqlite3
+*.h2.db
+
+# ============================================
+# Package Files
+# ============================================
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# ============================================
+# Documentation (optional - uncomment if needed)
+# ============================================
+# HELP.md

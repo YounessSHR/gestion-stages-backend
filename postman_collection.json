@@ -1,0 +1,737 @@
+{
+	"info": {
+		"_postman_id": "sprint1-gestion-stages",
+		"name": "Gestion Stages - Sprint 1",
+		"description": "Collection Postman pour tester le backend Spring Boot - Sprint 1 (Auth + Offres + Candidatures)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Authentification",
+			"item": [
+				{
+					"name": "Register - Étudiant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    pm.environment.set(\"studentEmail\", pm.response.json().message.includes(\"@\"));",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"etudiant1@test.com\",\n    \"motDePasse\": \"password123\",\n    \"nom\": \"Dupont\",\n    \"prenom\": \"Jean\",\n    \"telephone\": \"0612345678\",\n    \"role\": \"ETUDIANT\",\n    \"niveau\": \"L3\",\n    \"filiere\": \"Informatique\",\n    \"dateNaissance\": \"2000-01-15\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "Register - Entreprise",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"entreprise1@test.com\",\n    \"motDePasse\": \"password123\",\n    \"nom\": \"Martin\",\n    \"prenom\": \"Pierre\",\n    \"telephone\": \"0612345679\",\n    \"role\": \"ENTREPRISE\",\n    \"nomEntreprise\": \"TechCorp\",\n    \"secteurActivite\": \"Technologie\",\n    \"adresse\": \"123 Rue de la Tech, Paris\",\n    \"siteWeb\": \"https://techcorp.com\",\n    \"description\": \"Entreprise spécialisée en développement logiciel\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "Register - Administration",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@test.com\",\n    \"motDePasse\": \"password123\",\n    \"nom\": \"Admin\",\n    \"prenom\": \"Super\",\n    \"telephone\": \"0612345680\",\n    \"role\": \"ADMINISTRATION\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "Login - Étudiant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set(\"studentToken\", response.token);",
+									"    pm.environment.set(\"studentEmail\", response.email);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"etudiant1@test.com\",\n    \"motDePasse\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Login - Entreprise",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set(\"companyToken\", response.token);",
+									"    pm.environment.set(\"companyEmail\", response.email);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"entreprise1@test.com\",\n    \"motDePasse\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Login - Administration",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set(\"adminToken\", response.token);",
+									"    pm.environment.set(\"adminEmail\", response.email);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@test.com\",\n    \"motDePasse\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Offres",
+			"item": [
+				{
+					"name": "Créer une offre (Entreprise)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set(\"offreId\", response.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{companyToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"titre\": \"Développeur Full Stack - Stage\",\n    \"description\": \"Nous recherchons un stagiaire motivé pour développer des applications web modernes avec React et Spring Boot. Vous travaillerez sur des projets innovants et serez encadré par une équipe expérimentée.\",\n    \"typeOffre\": \"STAGE\",\n    \"duree\": 6,\n    \"dateDebut\": \"2025-07-01\",\n    \"dateFin\": \"2025-12-31\",\n    \"competencesRequises\": \"React, Spring Boot, Java, JavaScript, SQL\",\n    \"remuneration\": 800.0,\n    \"dateExpiration\": \"2025-06-15\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/offres",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "offres"]
+						}
+					}
+				},
+				{
+					"name": "Créer une offre Alternance",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{companyToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"titre\": \"Alternance Développeur Backend\",\n    \"description\": \"Alternance de 12 mois pour un développeur backend passionné par Java et Spring Boot. Formation en entreprise et à l'école.\",\n    \"typeOffre\": \"ALTERNANCE\",\n    \"duree\": 12,\n    \"dateDebut\": \"2025-09-01\",\n    \"dateFin\": \"2026-08-31\",\n    \"competencesRequises\": \"Java, Spring Boot, REST API, MySQL\",\n    \"remuneration\": 1200.0,\n    \"dateExpiration\": \"2025-08-15\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/offres",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "offres"]
+						}
+					}
+				},
+				{
+					"name": "Récupérer toutes les offres publiques (Public)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/offres/publiques",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "offres", "publiques"]
+						}
+					}
+				},
+				{
+					"name": "Récupérer une offre par ID (Public)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/offres/{{offreId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "offres", "{{offreId}}"]
+						}
+					}
+				},
+				{
+					"name": "Valider une offre (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/offres/{{offreId}}/valider",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "offres", "{{offreId}}", "valider"]
+						}
+					}
+				},
+				{
+					"name": "Mes offres (Entreprise)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{companyToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/offres/mes-offres",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "offres", "mes-offres"]
+						}
+					}
+				},
+				{
+					"name": "Rechercher des offres par titre (Public) - Mot partiel",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/offres/search?titre=Développeur",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "offres", "search"],
+							"query": [
+								{
+									"key": "titre",
+									"value": "Développeur"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Rechercher des offres par titre (Public) - Full Stack",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/offres/search?titre=Full Stack",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "offres", "search"],
+							"query": [
+								{
+									"key": "titre",
+									"value": "Full Stack"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Rechercher des offres par titre (Public) - Stage",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/offres/search?titre=Stage",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "offres", "search"],
+							"query": [
+								{
+									"key": "titre",
+									"value": "Stage"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Rechercher des offres - Sans paramètre (retourne toutes)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/offres/search",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "offres", "search"]
+						}
+					}
+				},
+				{
+					"name": "Modifier une offre (Entreprise)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{companyToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"titre\": \"Développeur Full Stack - Stage (Modifié)\",\n    \"description\": \"Description mise à jour avec plus de détails sur les missions.\",\n    \"typeOffre\": \"STAGE\",\n    \"duree\": 6,\n    \"dateDebut\": \"2025-07-01\",\n    \"dateFin\": \"2025-12-31\",\n    \"competencesRequises\": \"React, Spring Boot, Java, JavaScript, SQL, Docker\",\n    \"remuneration\": 900.0,\n    \"dateExpiration\": \"2025-06-20\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/offres/{{offreId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "offres", "{{offreId}}"]
+						}
+					}
+				},
+				{
+					"name": "Supprimer une offre (Entreprise)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{companyToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/offres/{{offreId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "offres", "{{offreId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Candidatures",
+			"item": [
+				{
+					"name": "Postuler à une offre (Étudiant)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set(\"candidatureId\", response.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{studentToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"offreId\": {{offreId}},\n    \"lettreMotivation\": \"Je suis très intéressé par cette offre de stage en développement Full Stack. Avec mes compétences en React et Spring Boot acquises lors de mes études, je suis convaincu que je pourrais apporter une valeur ajoutée à votre équipe. Je suis motivé, curieux et prêt à apprendre de nouvelles technologies.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/candidatures",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "candidatures"]
+						}
+					}
+				},
+				{
+					"name": "Mes candidatures (Étudiant)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{studentToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/candidatures/mes-candidatures",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "candidatures", "mes-candidatures"]
+						}
+					}
+				},
+				{
+					"name": "Récupérer une candidature par ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{companyToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/candidatures/{{candidatureId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "candidatures", "{{candidatureId}}"]
+						}
+					}
+				},
+				{
+					"name": "Candidatures pour une offre (Entreprise)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{companyToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/candidatures/offre/{{offreId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "candidatures", "offre", "{{offreId}}"]
+						}
+					}
+				},
+				{
+					"name": "Accepter une candidature (Entreprise)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test(\"Candidature acceptée\", function () {",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{companyToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/candidatures/{{candidatureId}}/accepter",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "candidatures", "{{candidatureId}}", "accepter"]
+						}
+					}
+				},
+				{
+					"name": "Refuser une candidature (Entreprise)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{companyToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"commentaire\": \"Nous avons choisi un autre candidat qui correspond mieux à nos besoins.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/candidatures/{{candidatureId}}/refuser",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "candidatures", "{{candidatureId}}", "refuser"]
+						}
+					}
+				},
+				{
+					"name": "Supprimer une candidature (Étudiant)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{studentToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/candidatures/{{candidatureId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "candidatures", "{{candidatureId}}"]
+						}
+					}
+				},
+				{
+					"name": "Tester RG01 - Double candidature (Doit échouer)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{studentToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"offreId\": {{offreId}},\n    \"lettreMotivation\": \"Tentative de double candidature - doit échouer selon RG01.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/candidatures",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "candidatures"]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "studentToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "companyToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "adminToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "offreId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "candidatureId",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
+
