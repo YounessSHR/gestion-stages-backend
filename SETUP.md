@@ -4,8 +4,8 @@
 
 ### 1. Clone the Repository
 ```bash
-git clone <repository-url>
-cd gestion-stages/backend
+git clone https://github.com/YounessSHR/gestion-stages-backend.git
+cd gestion-stages-backend
 ```
 
 ### 2. Create Configuration File

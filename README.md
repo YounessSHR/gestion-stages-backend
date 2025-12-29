@@ -22,7 +22,7 @@ Plateforme web pour la gestion complète des stages et alternances.
 
 1. **Cloner le repository**
 ```bash
-   git clone https://github.com/VotreUsername/gestion-stages-backend.git
+   git clone https://github.com/YounessSHR/gestion-stages-backend.git
 ```
 
 2. **Créer la base de données**
