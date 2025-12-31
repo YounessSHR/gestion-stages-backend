@@ -10,6 +10,7 @@ Plateforme web pour la gestion complète des stages et alternances.
 - **Sécurité** : Spring Security + JWT (0.12.5)
 - **ORM** : Hibernate / JPA
 - **Mapping** : ModelMapper 3.2.0
+- **PDF** : iText 7 (8.0.3)
 
 ## 📋 Prérequis
 
@@ -64,7 +65,7 @@ backend/
 │   ├── exception/        # Exception Handling
 │   └── util/             # Utilities
 ├── src/main/resources/
-│   ├── application.properties
+│   ├── application.properties.example
 │   └── templates/
 │       └── convention-template.html
 ├── postman_collection.json  # Postman collection for API testing
@@ -148,11 +149,17 @@ See `POSTMAN_GUIDE.md` for detailed testing instructions.
 
 ## 🔄 Next Steps (Sprint 2)
 
-- [ ] Convention management (signatures, PDF generation)
-- [ ] Stage follow-up (tutor assignments, progress tracking)
-- [ ] Administration dashboard
-- [ ] Email notifications
-- [ ] File upload (CV, documents)
+See `SPRINT2_PLAN.md` for detailed implementation plan.
+
+**Sprint 2 Features:**
+- [ ] Convention management (signatures, PDF generation) - RG04
+- [ ] Stage follow-up (tutor assignments, progress tracking) - RG05, RG07
+- [ ] Administration dashboard (statistics)
+
+**Business Rules to Implement:**
+- **RG04**: A convention requires 3 signatures (student, enterprise, admin)
+- **RG05**: A tutor can follow max 10 students
+- **RG07**: A student can only have one active internship at a time
 
 ## 📊 Database
 
@@ -175,6 +182,17 @@ The database schema is automatically created by Hibernate (`ddl-auto=update`).
 - Password encryption with BCrypt
 - Role-based authorization
 - CORS configured for React frontend (ports 3000, 5173)
+
+**⚠️ Important**: See `SECURITY.md` for security guidelines and setup instructions.
+
+## 📚 Documentation
+
+- `SETUP.md` - Setup instructions
+- `SECURITY.md` - Security guidelines
+- `POSTMAN_GUIDE.md` - Postman testing guide
+- `SPRINT2_PLAN.md` - Sprint 2 implementation plan
+- `CONCEPTION.md` - Project conception
+- `ARCHITECTURE.md` - System architecture
 
 ## 👥 Équipe
 
