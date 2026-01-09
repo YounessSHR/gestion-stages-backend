@@ -1,8 +1,8 @@
 {
 	"info": {
-		"_postman_id": "sprint1-gestion-stages",
-		"name": "Gestion Stages - Sprint 1",
-		"description": "Collection Postman pour tester le backend Spring Boot - Sprint 1 (Auth + Offres + Candidatures)",
+		"_postman_id": "gestion-stages-sprint1-2",
+		"name": "Gestion Stages - Sprint 1 & 2 (Complète)",
+		"description": "Collection Postman complète pour tester le backend Spring Boot - Sprint 1 (Auth + Offres + Candidatures) + Sprint 2 (Conventions + Suivi + Dashboard) + Workflows de Test end-to-end",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -699,6 +699,1921 @@
 					}
 				}
 			]
+		},
+		{
+			"name": "4. Conventions",
+			"item": [
+				{
+					"name": "Récupérer toutes les conventions (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/conventions",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "conventions"]
+						}
+					}
+				},
+				{
+					"name": "Récupérer une convention par ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response.id) {",
+									"        pm.environment.set(\"conventionId\", response.id.toString());",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{studentToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/conventions/{{conventionId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "conventions", "{{conventionId}}"]
+						}
+					}
+				},
+				{
+					"name": "Mes conventions (Étudiant/Entreprise)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{studentToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/conventions/mes-conventions",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "conventions", "mes-conventions"]
+						}
+					}
+				},
+				{
+					"name": "Conventions de l'étudiant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response && response.length > 0 && response[0].id) {",
+									"        pm.environment.set(\"conventionId\", response[0].id.toString());",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{studentToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/conventions/etudiant",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "conventions", "etudiant"]
+						}
+					}
+				},
+				{
+					"name": "Conventions de l'entreprise",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{companyToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/conventions/entreprise",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "conventions", "entreprise"]
+						}
+					}
+				},
+				{
+					"name": "Signer convention - Étudiant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Statut doit être EN_ATTENTE_SIGNATURES ou SIGNEE\", function () {",
+									"    if (pm.response.code === 200) {",
+									"        const response = pm.response.json();",
+									"        pm.expect(response.statut).to.be.oneOf([\"EN_ATTENTE_SIGNATURES\", \"SIGNEE\"]);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{studentToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/conventions/{{conventionId}}/signer-etudiant",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "conventions", "{{conventionId}}", "signer-etudiant"]
+						}
+					}
+				},
+				{
+					"name": "Signer convention - Entreprise",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Statut doit être EN_ATTENTE_SIGNATURES ou SIGNEE\", function () {",
+									"    if (pm.response.code === 200) {",
+									"        const response = pm.response.json();",
+									"        pm.expect(response.statut).to.be.oneOf([\"EN_ATTENTE_SIGNATURES\", \"SIGNEE\"]);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{companyToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/conventions/{{conventionId}}/signer-entreprise",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "conventions", "{{conventionId}}", "signer-entreprise"]
+						}
+					}
+				},
+				{
+					"name": "Signer convention - Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Statut doit être SIGNEE et PDF généré automatiquement\", function () {",
+									"    if (pm.response.code === 200) {",
+									"        const response = pm.response.json();",
+									"        pm.expect(response.statut).to.eql(\"SIGNEE\");",
+									"        pm.expect(response.fichierPdf).to.not.be.empty;",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/conventions/{{conventionId}}/signer-admin",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "conventions", "{{conventionId}}", "signer-admin"]
+						}
+					}
+				},
+				{
+					"name": "Générer PDF (manuel)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/conventions/{{conventionId}}/generer-pdf",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "conventions", "{{conventionId}}", "generer-pdf"]
+						}
+					}
+				},
+				{
+					"name": "Télécharger PDF",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{studentToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/conventions/{{conventionId}}/pdf",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "conventions", "{{conventionId}}", "pdf"]
+						}
+					}
+				},
+				{
+					"name": "Archiver convention (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/conventions/{{conventionId}}/archiver",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "conventions", "{{conventionId}}", "archiver"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Suivi des Stages",
+			"item": [
+				{
+					"name": "Register - Tuteur",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"tuteur1@test.com\",\n    \"motDePasse\": \"password123\",\n    \"nom\": \"Martin\",\n    \"prenom\": \"Pierre\",\n    \"telephone\": \"0612345681\",\n    \"role\": \"TUTEUR\",\n    \"departement\": \"Informatique\",\n    \"specialite\": \"Développement Web\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "Login - Tuteur",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set(\"tuteurToken\", response.token);",
+									"    pm.environment.set(\"tuteurId\", response.id.toString());",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"tuteur1@test.com\",\n    \"motDePasse\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Assigner un tuteur (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set(\"suiviStageId\", response.id.toString());",
+									"    pm.test(\"État d'avancement doit être NON_COMMENCE\", function () {",
+									"        pm.expect(response.etatAvancement).to.eql(\"NON_COMMENCE\");",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"conventionId\": {{conventionId}},\n    \"tuteurId\": {{tuteurId}}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/suivis/assigner-tuteur",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "suivis", "assigner-tuteur"]
+						}
+					}
+				},
+				{
+					"name": "Récupérer tous les suivis (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/suivis",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "suivis"]
+						}
+					}
+				},
+				{
+					"name": "Récupérer un suivi par ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/suivis/{{suiviStageId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "suivis", "{{suiviStageId}}"]
+						}
+					}
+				},
+				{
+					"name": "Mes étudiants (Tuteur)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{tuteurToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/suivis/mes-etudiants",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "suivis", "mes-etudiants"]
+						}
+					}
+				},
+				{
+					"name": "Mon stage (Étudiant)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{studentToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/suivis/mon-stage",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "suivis", "mon-stage"]
+						}
+					}
+				},
+				{
+					"name": "Mettre à jour l'avancement (Tuteur)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{tuteurToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"etatAvancement\": \"EN_COURS\",\n    \"commentaires\": \"L'étudiant progresse bien. Il a terminé la première phase du projet.\",\n    \"derniereVisite\": \"2025-07-15\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/suivis/{{suiviStageId}}/avancement",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "suivis", "{{suiviStageId}}", "avancement"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "6. Dashboard Administration",
+			"item": [
+				{
+					"name": "Statistiques du dashboard (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/dashboard/stats",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "admin", "dashboard", "stats"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "7. Workflows de Test",
+			"description": "Scénarios de test end-to-end pour valider toutes les fonctionnalités (Sprint 1 + Sprint 2)",
+			"item": [
+				{
+					"name": "Workflow 1 - Convention complète avec signatures",
+					"description": "Cycle complet : Candidature acceptée → Convention → 3 Signatures → PDF → Assignation Tuteur",
+					"item": [
+						{
+							"name": "Step 1 - Login Étudiant (Workflow)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    const response = pm.response.json();",
+											"    pm.environment.set(\"studentToken\", response.token);",
+											"    pm.environment.set(\"studentEmail\", response.email);",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"etudiant1@test.com\",\n    \"motDePasse\": \"password123\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/auth/login",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "auth", "login"]
+								}
+							}
+						},
+						{
+							"name": "Step 2 - Login Entreprise (Workflow)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    const response = pm.response.json();",
+											"    pm.environment.set(\"companyToken\", response.token);",
+											"    pm.environment.set(\"companyEmail\", response.email);",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"entreprise1@test.com\",\n    \"motDePasse\": \"password123\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/auth/login",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "auth", "login"]
+								}
+							}
+						},
+						{
+							"name": "Step 3 - Login Admin (Workflow)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    const response = pm.response.json();",
+											"    pm.environment.set(\"adminToken\", response.token);",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"admin@test.com\",\n    \"motDePasse\": \"password123\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/auth/login",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "auth", "login"]
+								}
+							}
+						},
+						{
+							"name": "Step 4 - Créer offre (Workflow)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 201) {",
+											"    const response = pm.response.json();",
+											"    pm.environment.set(\"offreId\", response.id.toString());",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{companyToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"titre\": \"Stage Développeur Full Stack\",\n    \"description\": \"Stage de 6 mois en développement web\",\n    \"typeOffre\": \"STAGE\",\n    \"duree\": 6,\n    \"dateDebut\": \"2025-07-01\",\n    \"dateFin\": \"2025-12-31\",\n    \"competencesRequises\": \"React, Spring Boot, Java\",\n    \"remuneration\": 800.0,\n    \"dateExpiration\": \"2025-06-15\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/offres",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "offres"]
+								}
+							}
+						},
+						{
+							"name": "Step 5 - Valider offre (Workflow)",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/offres/{{offreId}}/valider",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "offres", "{{offreId}}", "valider"]
+								}
+							}
+						},
+						{
+							"name": "Step 6 - Postuler (Workflow)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 201) {",
+											"    const response = pm.response.json();",
+											"    pm.environment.set(\"candidatureId\", response.id.toString());",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{studentToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"offreId\": {{offreId}},\n    \"lettreMotivation\": \"Je suis très motivé pour ce stage.\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/candidatures",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "candidatures"]
+								}
+							}
+						},
+						{
+							"name": "Step 7 - Accepter candidature (Workflow)",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{companyToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/candidatures/{{candidatureId}}/accepter",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "candidatures", "{{candidatureId}}", "accepter"]
+								}
+							}
+						},
+						{
+							"name": "Step 8 - Récupérer convention (Workflow)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    const response = pm.response.json();",
+											"    if (response && response.length > 0) {",
+											"        pm.environment.set(\"conventionId\", response[0].id.toString());",
+											"        pm.test(\"Statut doit être BROUILLON\", function () {",
+											"            pm.expect(response[0].statut).to.eql(\"BROUILLON\");",
+											"        });",
+											"    }",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{studentToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/conventions/mes-conventions",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "conventions", "mes-conventions"]
+								}
+							}
+						},
+						{
+							"name": "Step 9 - Signature Étudiant (Workflow)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Statut doit passer à EN_ATTENTE_SIGNATURES\", function () {",
+											"    if (pm.response.code === 200) {",
+											"        const response = pm.response.json();",
+											"        pm.expect(response.statut).to.eql(\"EN_ATTENTE_SIGNATURES\");",
+											"    }",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{studentToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/conventions/{{conventionId}}/signer-etudiant",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "conventions", "{{conventionId}}", "signer-etudiant"]
+								}
+							}
+						},
+						{
+							"name": "Step 10 - Signature Entreprise (Workflow)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Statut reste EN_ATTENTE_SIGNATURES\", function () {",
+											"    if (pm.response.code === 200) {",
+											"        const response = pm.response.json();",
+											"        pm.expect(response.statut).to.eql(\"EN_ATTENTE_SIGNATURES\");",
+											"    }",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{companyToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/conventions/{{conventionId}}/signer-entreprise",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "conventions", "{{conventionId}}", "signer-entreprise"]
+								}
+							}
+						},
+						{
+							"name": "Step 11 - Signature Admin (Workflow)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Statut doit être SIGNEE et PDF généré automatiquement\", function () {",
+											"    if (pm.response.code === 200) {",
+											"        const response = pm.response.json();",
+											"        pm.expect(response.statut).to.eql(\"SIGNEE\");",
+											"        pm.expect(response.fichierPdf).to.not.be.empty;",
+											"    }",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/conventions/{{conventionId}}/signer-admin",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "conventions", "{{conventionId}}", "signer-admin"]
+								}
+							}
+						},
+						{
+							"name": "Step 12 - Vérifier PDF généré (Workflow)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"PDF doit être présent\", function () {",
+											"    if (pm.response.code === 200) {",
+											"        const response = pm.response.json();",
+											"        pm.expect(response.fichierPdf).to.not.be.empty;",
+											"    }",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{studentToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/conventions/{{conventionId}}",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "conventions", "{{conventionId}}"]
+								}
+							}
+						},
+						{
+							"name": "Step 13 - Télécharger PDF (Workflow)",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{studentToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/conventions/{{conventionId}}/pdf",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "conventions", "{{conventionId}}", "pdf"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Workflow 2 - Assignation Tuteur et Suivi",
+					"description": "Tester l'assignation d'un tuteur et le suivi du stage",
+					"item": [
+						{
+							"name": "Step 1 - Login Tuteur (Workflow)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    const response = pm.response.json();",
+											"    pm.environment.set(\"tuteurToken\", response.token);",
+											"    pm.environment.set(\"tuteurId\", response.id.toString());",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"tuteur1@test.com\",\n    \"motDePasse\": \"password123\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/auth/login",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "auth", "login"]
+								}
+							}
+						},
+						{
+							"name": "Step 2 - Assigner Tuteur (Workflow)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 201) {",
+											"    const response = pm.response.json();",
+											"    pm.environment.set(\"suiviStageId\", response.id.toString());",
+											"    pm.test(\"État doit être NON_COMMENCE\", function () {",
+											"        pm.expect(response.etatAvancement).to.eql(\"NON_COMMENCE\");",
+											"    });",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"conventionId\": {{conventionId}},\n    \"tuteurId\": {{tuteurId}}\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/suivis/assigner-tuteur",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "suivis", "assigner-tuteur"]
+								}
+							}
+						},
+						{
+							"name": "Step 3 - Mettre à jour avancement EN_COURS (Workflow)",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{tuteurToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"etatAvancement\": \"EN_COURS\",\n    \"commentaires\": \"L'étudiant a bien commencé son stage. Il s'intègre parfaitement dans l'équipe.\",\n    \"derniereVisite\": \"2025-07-15\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/suivis/{{suiviStageId}}/avancement",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "suivis", "{{suiviStageId}}", "avancement"]
+								}
+							}
+						},
+						{
+							"name": "Step 4 - Récupérer mon stage (Étudiant) (Workflow)",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{studentToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/suivis/mon-stage",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "suivis", "mon-stage"]
+								}
+							}
+						},
+						{
+							"name": "Step 5 - Marquer stage terminé (Workflow)",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{tuteurToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"etatAvancement\": \"TERMINE\",\n    \"commentaires\": \"Stage terminé avec succès. L'étudiant a réalisé un excellent travail.\",\n    \"derniereVisite\": \"2025-12-31\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/suivis/{{suiviStageId}}/avancement",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "suivis", "{{suiviStageId}}", "avancement"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Workflow 3 - Dashboard Administration",
+					"description": "Tester le dashboard avec toutes les statistiques",
+					"item": [
+						{
+							"name": "Step 1 - Login Admin (Workflow)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    const response = pm.response.json();",
+											"    pm.environment.set(\"adminToken\", response.token);",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"admin@test.com\",\n    \"motDePasse\": \"password123\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/auth/login",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "auth", "login"]
+								}
+							}
+						},
+						{
+							"name": "Step 2 - Récupérer statistiques dashboard (Workflow)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Statistiques complètes retournées\", function () {",
+											"    if (pm.response.code === 200) {",
+											"        const response = pm.response.json();",
+											"        pm.expect(response).to.have.property(\"totalOffres\");",
+											"        pm.expect(response).to.have.property(\"totalCandidatures\");",
+											"        pm.expect(response).to.have.property(\"totalConventions\");",
+											"        pm.expect(response).to.have.property(\"topEntreprises\");",
+											"        pm.expect(response).to.have.property(\"topTuteurs\");",
+											"    }",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/dashboard/stats",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "admin", "dashboard", "stats"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Workflow 4 - Test RG04 (3 signatures)",
+					"description": "Tester RG04 : Une convention nécessite 3 signatures",
+					"item": [
+						{
+							"name": "Step 1 - Tenter générer PDF avant signatures (Doit échouer)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Doit retourner 400 - convention non signée\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/conventions/{{conventionId}}/generer-pdf",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "conventions", "{{conventionId}}", "generer-pdf"]
+								}
+							}
+						},
+						{
+							"name": "Step 2 - Signer Étudiant (RG04)",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{studentToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/conventions/{{conventionId}}/signer-etudiant",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "conventions", "{{conventionId}}", "signer-etudiant"]
+								}
+							}
+						},
+						{
+							"name": "Step 3 - Tenter signer 2 fois Étudiant (Doit échouer)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Doit retourner 400 - déjà signé\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{studentToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/conventions/{{conventionId}}/signer-etudiant",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "conventions", "{{conventionId}}", "signer-etudiant"]
+								}
+							}
+						},
+						{
+							"name": "Step 4 - Vérifier PDF après 3 signatures",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"PDF doit être présent après 3 signatures\", function () {",
+											"    if (pm.response.code === 200) {",
+											"        const response = pm.response.json();",
+											"        pm.expect(response.fichierPdf).to.not.be.empty;",
+											"    }",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/conventions/{{conventionId}}",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "conventions", "{{conventionId}}"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Workflow 5 - Test RG05 (Max 10 étudiants)",
+					"description": "Tester RG05 : Un tuteur peut suivre max 10 étudiants actifs",
+					"item": [
+						{
+							"name": "Note - Créer 11 conventions signées",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"description": "Prérequis : Créer 11 conventions signées avec 11 étudiants différents. Ensuite tester l'assignation du 11ème qui doit échouer.",
+								"url": {
+									"raw": "{{baseUrl}}/api/conventions",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "conventions"]
+								}
+							}
+						},
+						{
+							"name": "Step 1 - Assigner 10 étudiants (Workflow RG05)",
+							"description": "Répéter cette requête 10 fois avec différentes conventions. Variable tuteurId doit être défini.",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"conventionId\": {{conventionId}},\n    \"tuteurId\": {{tuteurId}}\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/suivis/assigner-tuteur",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "suivis", "assigner-tuteur"]
+								}
+							}
+						},
+						{
+							"name": "Step 2 - Tenter assigner 11ème étudiant (Doit échouer RG05)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Doit retourner 400 - limite de 10 étudiants atteinte\", function () {",
+											"    pm.response.to.have.status(400);",
+											"    const response = pm.response.json();",
+											"    pm.expect(response.message).to.include(\"10 étudiants\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"conventionId\": {{conventionId}},\n    \"tuteurId\": {{tuteurId}}\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/suivis/assigner-tuteur",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "suivis", "assigner-tuteur"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Workflow 6 - Test RG07 (Un seul stage actif)",
+					"description": "Tester RG07 : Un étudiant ne peut avoir qu'un seul stage actif",
+					"item": [
+						{
+							"name": "Step 1 - Assigner premier stage (Workflow RG07)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 201) {",
+											"    const response = pm.response.json();",
+											"    pm.environment.set(\"suiviStageId1\", response.id.toString());",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"conventionId\": {{conventionId}},\n    \"tuteurId\": {{tuteurId}}\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/suivis/assigner-tuteur",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "suivis", "assigner-tuteur"]
+								}
+							}
+						},
+						{
+							"name": "Step 2 - Tenter assigner deuxième stage (même étudiant - Doit échouer)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Doit retourner 400 - étudiant a déjà un stage actif\", function () {",
+											"    pm.response.to.have.status(400);",
+											"    const response = pm.response.json();",
+											"    pm.expect(response.message).to.include(\"stage actif\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"conventionId\": {{conventionId}},\n    \"tuteurId\": {{tuteurId}}\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/suivis/assigner-tuteur",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "suivis", "assigner-tuteur"]
+								}
+							}
+						},
+						{
+							"name": "Step 3 - Marquer premier stage TERMINE (Workflow RG07)",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{tuteurToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"etatAvancement\": \"TERMINE\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/suivis/{{suiviStageId1}}/avancement",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "suivis", "{{suiviStageId1}}", "avancement"]
+								}
+							}
+						},
+						{
+							"name": "Step 4 - Assigner deuxième stage (maintenant possible)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Maintenant possible car premier stage terminé\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"conventionId\": {{conventionId}},\n    \"tuteurId\": {{tuteurId}}\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/suivis/assigner-tuteur",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "suivis", "assigner-tuteur"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Workflow 7 - Tests Sécurité et Permissions",
+					"description": "Tester les permissions et la sécurité des endpoints",
+					"item": [
+						{
+							"name": "Step 1 - Tenter signer convention autre étudiant (Doit échouer)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Doit retourner 403 - non autorisé\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{studentToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"description": "Tenter de signer une convention qui n'appartient pas à l'étudiant connecté",
+								"url": {
+									"raw": "{{baseUrl}}/api/conventions/{{conventionId}}/signer-etudiant",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "conventions", "{{conventionId}}", "signer-etudiant"]
+								}
+							}
+						},
+						{
+							"name": "Step 2 - Tenter assigner tuteur sans être admin (Doit échouer)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Doit retourner 403 - seuls admins peuvent assigner\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{companyToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"conventionId\": {{conventionId}},\n    \"tuteurId\": {{tuteurId}}\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/suivis/assigner-tuteur",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "suivis", "assigner-tuteur"]
+								}
+							}
+						},
+						{
+							"name": "Step 3 - Tenter accéder dashboard sans être admin (Doit échouer)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Doit retourner 403 - seuls admins peuvent accéder\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{studentToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/dashboard/stats",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "admin", "dashboard", "stats"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Workflow 8 - Archiver Convention",
+					"description": "Tester l'archivage d'une convention",
+					"item": [
+						{
+							"name": "Step 1 - Archiver convention signée (Workflow)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Statut doit passer à ARCHIVEE\", function () {",
+											"    if (pm.response.code === 200) {",
+											"        const response = pm.response.json();",
+											"        pm.expect(response.statut).to.eql(\"ARCHIVEE\");",
+											"    }",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/conventions/{{conventionId}}/archiver",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "conventions", "{{conventionId}}", "archiver"]
+								}
+							}
+						},
+						{
+							"name": "Step 2 - Tenter archiver convention non signée (Doit échouer)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Doit retourner 400 - seules conventions signées\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/conventions/{{conventionId}}/archiver",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "conventions", "{{conventionId}}", "archiver"]
+								}
+							}
+						}
+					]
+				}
+			]
 		}
 	],
 	"variable": [
@@ -729,6 +2644,31 @@
 		},
 		{
 			"key": "candidatureId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "conventionId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "tuteurId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "tuteurToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "suiviStageId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "suiviStageId1",
 			"value": "",
 			"type": "string"
 		}

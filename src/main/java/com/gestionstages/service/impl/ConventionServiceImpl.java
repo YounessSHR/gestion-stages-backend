@@ -5,12 +5,8 @@ import com.gestionstages.exception.ResourceNotFoundException;
 import com.gestionstages.exception.UnauthorizedException;
 import com.gestionstages.model.dto.response.ConventionResponse;
 import com.gestionstages.model.entity.Convention;
-import com.gestionstages.model.entity.Etudiant;
-import com.gestionstages.model.enums.RoleEnum;
 import com.gestionstages.model.enums.StatutConventionEnum;
 import com.gestionstages.repository.ConventionRepository;
-import com.gestionstages.repository.EtudiantRepository;
-import com.gestionstages.repository.UtilisateurRepository;
 import com.gestionstages.service.ConventionService;
 import com.gestionstages.service.PdfGeneratorService;
 import org.modelmapper.ModelMapper;
@@ -30,12 +26,6 @@ public class ConventionServiceImpl implements ConventionService {
 
     @Autowired
     private ConventionRepository conventionRepository;
-
-    @Autowired
-    private UtilisateurRepository utilisateurRepository;
-
-    @Autowired
-    private EtudiantRepository etudiantRepository;
 
     @Autowired
     private PdfGeneratorService pdfGeneratorService;
@@ -188,6 +178,7 @@ public class ConventionServiceImpl implements ConventionService {
      * Business Rule RG04: 
      * - BROUILLON → EN_ATTENTE_SIGNATURES (when first signature is added)
      * - EN_ATTENTE_SIGNATURES → SIGNEE (when all 3 signatures are collected)
+     * - Automatically generates PDF when all 3 signatures are collected (SPRINT2_PLAN.md line 198)
      */
     private void updateConventionStatus(Convention convention) {
         boolean allSigned = convention.getSignatureEtudiant() && 
@@ -196,6 +187,18 @@ public class ConventionServiceImpl implements ConventionService {
 
         if (allSigned) {
             convention.setStatut(StatutConventionEnum.SIGNEE);
+            
+            // Automatically generate PDF when all 3 signatures are collected (SPRINT2_PLAN.md line 198)
+            if (convention.getFichierPdf() == null || convention.getFichierPdf().isEmpty()) {
+                try {
+                    String pdfFileName = pdfGeneratorService.generateConventionPdf(convention);
+                    convention.setFichierPdf(pdfFileName);
+                } catch (Exception e) {
+                    // Log error but don't fail the signature process
+                    // PDF can be generated manually later if needed
+                    System.err.println("Erreur lors de la génération automatique du PDF: " + e.getMessage());
+                }
+            }
         } else if (convention.getSignatureEtudiant() || 
                    convention.getSignatureEntreprise() || 
                    convention.getSignatureAdministration()) {

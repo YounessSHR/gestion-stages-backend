@@ -140,26 +140,97 @@ backend/
 ### Testing
 
 A complete Postman collection is provided (`postman_collection.json`) with:
-- All endpoints pre-configured
+- All endpoints pre-configured (Sprint 1 + Sprint 2)
 - Automatic token management
-- Test scenarios for business rules
-- Examples for all user roles
+- Test scenarios for business rules (RG01, RG02, RG03, RG04, RG05, RG07)
+- Examples for all user roles (Student, Enterprise, Tutor, Administration)
+
+A complete test workflow JSON is provided (`TEST_WORKFLOW_SPRINT2.json`) with:
+- End-to-end test scenarios for Sprint 2
+- Step-by-step workflows
+- Business rules validation tests
+- Security and permissions tests
 
 See `POSTMAN_GUIDE.md` for detailed testing instructions.
 
-## 🔄 Next Steps (Sprint 2)
+## ✅ Sprint 2 - Completed
 
-See `SPRINT2_PLAN.md` for detailed implementation plan.
+### Features Implemented
 
-**Sprint 2 Features:**
-- [ ] Convention management (signatures, PDF generation) - RG04
-- [ ] Stage follow-up (tutor assignments, progress tracking) - RG05, RG07
-- [ ] Administration dashboard (statistics)
+#### 1. Convention Management (RG04)
+- ✅ Create convention (automatically when application is accepted - Sprint 1)
+- ✅ Get all conventions (admin only)
+- ✅ Get convention by ID
+- ✅ Get my conventions (student/enterprise)
+- ✅ Get conventions by student
+- ✅ Get conventions by enterprise
+- ✅ Student signs convention (student owner only)
+- ✅ Enterprise signs convention (enterprise owner only)
+- ✅ Administration signs convention (admin only)
+- ✅ Generate PDF (manual and automatic when all 3 signatures are collected)
+- ✅ Download PDF
+- ✅ Archive convention (admin only)
 
-**Business Rules to Implement:**
+**Business Rules Implemented:**
 - **RG04**: A convention requires 3 signatures (student, enterprise, admin)
-- **RG05**: A tutor can follow max 10 students
+  - First signature → Status changes from `BROUILLON` to `EN_ATTENTE_SIGNATURES`
+  - Third signature → Status changes to `SIGNEE` + PDF generated automatically
+
+#### 2. Stage Follow-up (RG05, RG07)
+- ✅ Assign tutor to signed convention (admin only)
+- ✅ Get all follow-ups (admin only)
+- ✅ Get follow-up by ID
+- ✅ Get my students (tutor only)
+- ✅ Get my stage (student only)
+- ✅ Update progress (tutor owner only)
+
+**Business Rules Implemented:**
+- **RG05**: A tutor can follow max 10 active students
+  - Only active students are counted (state != `TERMINE`)
 - **RG07**: A student can only have one active internship at a time
+  - An internship is active if `etatAvancement != TERMINE`
+
+#### 3. Administration Dashboard
+- ✅ Get dashboard statistics (admin only)
+  - General statistics (offers, applications, conventions, follow-ups)
+  - Top companies (by number of offers)
+  - Top tutors (by number of active students)
+  - Distribution by status/state
+
+### API Endpoints (Sprint 2)
+
+#### Conventions
+- `GET /api/conventions` - Get all conventions (Admin, auth required)
+- `GET /api/conventions/{id}` - Get convention by ID (auth required)
+- `GET /api/conventions/mes-conventions` - Get my conventions (auth required)
+- `GET /api/conventions/etudiant` - Get conventions by student (Student, auth required)
+- `GET /api/conventions/entreprise` - Get conventions by enterprise (Enterprise, auth required)
+- `PUT /api/conventions/{id}/signer-etudiant` - Student signs convention (Student, auth required)
+- `PUT /api/conventions/{id}/signer-entreprise` - Enterprise signs convention (Enterprise, auth required)
+- `PUT /api/conventions/{id}/signer-admin` - Admin signs convention (Admin, auth required)
+- `POST /api/conventions/{id}/generer-pdf` - Generate PDF manually (auth required)
+- `GET /api/conventions/{id}/pdf` - Download PDF (auth required)
+- `PUT /api/conventions/{id}/archiver` - Archive convention (Admin, auth required)
+
+#### Stage Follow-up
+- `POST /api/suivis/assigner-tuteur` - Assign tutor (Admin, auth required)
+- `GET /api/suivis` - Get all follow-ups (Admin, auth required)
+- `GET /api/suivis/{id}` - Get follow-up by ID (auth required)
+- `GET /api/suivis/mes-etudiants` - Get my students (Tutor, auth required)
+- `GET /api/suivis/mon-stage` - Get my stage (Student, auth required)
+- `PUT /api/suivis/{id}/avancement` - Update progress (Tutor, auth required)
+
+#### Dashboard
+- `GET /api/admin/dashboard/stats` - Get dashboard statistics (Admin, auth required)
+
+**See `API_ENDPOINTS_SPRINT2.md` for complete API documentation.**
+
+## 🔄 Next Steps (Sprint 3)
+
+**Sprint 3 Features (Frontend):**
+- [ ] React frontend implementation
+- [ ] Integration with backend API
+- [ ] User interface for all roles
 
 ## 📊 Database
 
@@ -191,6 +262,9 @@ The database schema is automatically created by Hibernate (`ddl-auto=update`).
 - `SECURITY.md` - Security guidelines
 - `POSTMAN_GUIDE.md` - Postman testing guide
 - `SPRINT2_PLAN.md` - Sprint 2 implementation plan
+- `SPRINT2_VERIFICATION_REPORT.md` - Sprint 2 verification report
+- `API_ENDPOINTS_SPRINT2.md` - Complete API documentation for Sprint 2
+- `TEST_WORKFLOW_SPRINT2.json` - Complete test workflow for Sprint 2
 - `CONCEPTION.md` - Project conception
 - `ARCHITECTURE.md` - System architecture
 

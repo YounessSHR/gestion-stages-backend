@@ -8,6 +8,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +38,7 @@ public class ConventionController {
      * @return List of convention responses
      */
     @GetMapping
+    @PreAuthorize("hasRole('ADMINISTRATION')")
     public ResponseEntity<List<ConventionResponse>> getAllConventions(Authentication authentication) {
         List<ConventionResponse> conventions = conventionService.getAllConventions();
         return ResponseEntity.ok(conventions);
@@ -85,6 +87,7 @@ public class ConventionController {
      * @return List of convention responses
      */
     @GetMapping("/etudiant")
+    @PreAuthorize("hasRole('ETUDIANT')")
     public ResponseEntity<List<ConventionResponse>> getConventionsByEtudiant(Authentication authentication) {
         String email = authentication.getName();
         List<ConventionResponse> conventions = conventionService.getConventionsByEtudiant(email);
@@ -100,6 +103,7 @@ public class ConventionController {
      * @return List of convention responses
      */
     @GetMapping("/entreprise")
+    @PreAuthorize("hasRole('ENTREPRISE')")
     public ResponseEntity<List<ConventionResponse>> getConventionsByEntreprise(Authentication authentication) {
         String email = authentication.getName();
         List<ConventionResponse> conventions = conventionService.getConventionsByEntreprise(email);
@@ -116,6 +120,7 @@ public class ConventionController {
      * @return Updated convention response
      */
     @PutMapping("/{id}/signer-etudiant")
+    @PreAuthorize("hasRole('ETUDIANT')")
     public ResponseEntity<ConventionResponse> signerEtudiant(
             @PathVariable Long id,
             Authentication authentication) {
@@ -134,6 +139,7 @@ public class ConventionController {
      * @return Updated convention response
      */
     @PutMapping("/{id}/signer-entreprise")
+    @PreAuthorize("hasRole('ENTREPRISE')")
     public ResponseEntity<ConventionResponse> signerEntreprise(
             @PathVariable Long id,
             Authentication authentication) {
@@ -151,6 +157,7 @@ public class ConventionController {
      * @return Updated convention response
      */
     @PutMapping("/{id}/signer-admin")
+    @PreAuthorize("hasRole('ADMINISTRATION')")
     public ResponseEntity<ConventionResponse> signerAdmin(@PathVariable Long id) {
         ConventionResponse convention = conventionService.signerAdmin(id);
         return ResponseEntity.ok(convention);
@@ -203,6 +210,7 @@ public class ConventionController {
      * @return Updated convention response
      */
     @PutMapping("/{id}/archiver")
+    @PreAuthorize("hasRole('ADMINISTRATION')")
     public ResponseEntity<ConventionResponse> archiverConvention(@PathVariable Long id) {
         ConventionResponse convention = conventionService.archiverConvention(id);
         return ResponseEntity.ok(convention);

@@ -4,6 +4,7 @@ import com.gestionstages.model.dto.response.DashboardStatsResponse;
 import com.gestionstages.service.DashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -26,6 +27,7 @@ public class DashboardController {
      * @return Dashboard statistics response
      */
     @GetMapping("/stats")
+    @PreAuthorize("hasRole('ADMINISTRATION')")
     public ResponseEntity<DashboardStatsResponse> getDashboardStats() {
         DashboardStatsResponse stats = dashboardService.getDashboardStats();
         return ResponseEntity.ok(stats);

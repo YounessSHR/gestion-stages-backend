@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +35,7 @@ public class SuiviController {
      * @return Created suivi stage response
      */
     @PostMapping("/assigner-tuteur")
+    @PreAuthorize("hasRole('ADMINISTRATION')")
     public ResponseEntity<SuiviStageResponse> assignerTuteur(
             @Valid @RequestBody AssignTuteurRequest request) {
         SuiviStageResponse suiviStage = suiviService.assignerTuteur(request);
@@ -48,6 +50,7 @@ public class SuiviController {
      * @return List of all suivi stage responses
      */
     @GetMapping
+    @PreAuthorize("hasRole('ADMINISTRATION')")
     public ResponseEntity<List<SuiviStageResponse>> getAllSuivis() {
         List<SuiviStageResponse> suivis = suiviService.getAllSuivis();
         return ResponseEntity.ok(suivis);
@@ -76,6 +79,7 @@ public class SuiviController {
      * @return List of suivi stage responses
      */
     @GetMapping("/mes-etudiants")
+    @PreAuthorize("hasRole('TUTEUR')")
     public ResponseEntity<List<SuiviStageResponse>> getMesEtudiants(Authentication authentication) {
         String email = authentication.getName();
         List<SuiviStageResponse> suivis = suiviService.getMesEtudiants(email);
@@ -91,6 +95,7 @@ public class SuiviController {
      * @return Suivi stage response (or 404 if none)
      */
     @GetMapping("/mon-stage")
+    @PreAuthorize("hasRole('ETUDIANT')")
     public ResponseEntity<SuiviStageResponse> getMonStage(Authentication authentication) {
         String email = authentication.getName();
         SuiviStageResponse suiviStage = suiviService.getMonStage(email);
@@ -111,6 +116,7 @@ public class SuiviController {
      * @return Updated suivi stage response
      */
     @PutMapping("/{id}/avancement")
+    @PreAuthorize("hasRole('TUTEUR')")
     public ResponseEntity<SuiviStageResponse> updateSuivi(
             @PathVariable Long id,
             @Valid @RequestBody UpdateSuiviRequest request,
