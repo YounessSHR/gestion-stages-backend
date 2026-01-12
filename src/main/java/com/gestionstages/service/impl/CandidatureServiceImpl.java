@@ -20,6 +20,8 @@ import com.gestionstages.repository.EtudiantRepository;
 import com.gestionstages.repository.OffreStageRepository;
 import com.gestionstages.repository.UtilisateurRepository;
 import com.gestionstages.service.CandidatureService;
+import com.gestionstages.service.EmailService;
+import com.gestionstages.service.NotificationService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,6 +55,12 @@ public class CandidatureServiceImpl implements CandidatureService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     /**
      * Creates a new application for an offer.
@@ -200,6 +208,7 @@ public class CandidatureServiceImpl implements CandidatureService {
         Candidature savedCandidature = candidatureRepository.save(candidature);
 
         // RG03: An accepted application triggers automatic convention generation
+        Convention savedConvention = null;
         if (savedCandidature.getConvention() == null) {
             Convention convention = new Convention();
             convention.setCandidature(savedCandidature);
@@ -210,8 +219,20 @@ public class CandidatureServiceImpl implements CandidatureService {
             convention.setSignatureEntreprise(false);
             convention.setSignatureAdministration(false);
             
-            conventionRepository.save(convention);
+            savedConvention = conventionRepository.save(convention);
         }
+
+        // Send email and notification asynchronously (non-blocking)
+        emailService.sendCandidatureAcceptee(savedCandidature);
+        if (savedConvention != null) {
+            emailService.sendConventionCreee(savedConvention);
+        }
+        notificationService.creerNotification(
+                savedCandidature.getEtudiant().getId(),
+                "Votre candidature pour '" + savedCandidature.getOffre().getTitre() + "' a été acceptée !",
+                "CANDIDATURE",
+                "/etudiant/candidatures"
+        );
 
         return convertToResponse(savedCandidature);
     }
@@ -249,6 +270,16 @@ public class CandidatureServiceImpl implements CandidatureService {
         candidature.setDateTraitement(LocalDateTime.now());
 
         Candidature savedCandidature = candidatureRepository.save(candidature);
+        
+        // Send email and notification asynchronously (non-blocking)
+        emailService.sendCandidatureRefusee(savedCandidature, commentaire);
+        notificationService.creerNotification(
+                savedCandidature.getEtudiant().getId(),
+                "Votre candidature pour '" + savedCandidature.getOffre().getTitre() + "' a été refusée.",
+                "CANDIDATURE",
+                "/etudiant/candidatures"
+        );
+        
         return convertToResponse(savedCandidature);
     }
 

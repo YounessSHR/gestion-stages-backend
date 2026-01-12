@@ -1,16 +1,26 @@
 package com.gestionstages.service;
 
+import com.gestionstages.model.dto.request.OffreFilterRequest;
 import com.gestionstages.model.dto.request.OffreRequest;
 import com.gestionstages.model.dto.response.OffreResponse;
+import com.gestionstages.model.dto.response.PageResponse;
 
 import java.util.List;
 
 public interface OffreService {
     
     /**
-     * Récupère toutes les offres publiques (validées et non expirées)
+     * Récupère toutes les offres publiques (validées et non expirées) avec pagination et filtres
      * Accessible à tous (étudiants)
      */
+    PageResponse<OffreResponse> getOffresPubliques(OffreFilterRequest filter);
+    
+    /**
+     * Récupère toutes les offres publiques (validées et non expirées)
+     * Accessible à tous (étudiants)
+     * @deprecated Use getOffresPubliques(OffreFilterRequest) instead
+     */
+    @Deprecated
     List<OffreResponse> getAllOffresPubliques();
     
     /**
@@ -49,4 +59,17 @@ public interface OffreService {
      * Recherche d'offres par titre
      */
     List<OffreResponse> searchOffres(String titre);
+    
+    /**
+     * Récupère toutes les offres (admin uniquement)
+     * Inclut toutes les offres, y compris celles en attente
+     */
+    List<OffreResponse> getAllOffres();
+    
+    /**
+     * Marque automatiquement les offres expirées (RG06)
+     * Business Rule RG06: Une offre expirée n'est plus consultable
+     * Cette méthode doit être appelée périodiquement (scheduler) ou manuellement
+     */
+    void marquerOffresExpirees();
 }

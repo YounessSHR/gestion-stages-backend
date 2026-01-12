@@ -4,6 +4,8 @@ import com.gestionstages.model.entity.Entreprise;
 import com.gestionstages.model.entity.OffreStage;
 import com.gestionstages.model.enums.StatutOffreEnum;
 import com.gestionstages.model.enums.TypeOffreEnum;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -32,4 +34,22 @@ public interface OffreStageRepository extends JpaRepository<OffreStage, Long> {
     List<OffreStage> findAllValidOffres();
 
     List<OffreStage> findByTitreContainingIgnoreCase(String titre);
+
+    // Paginated query with filters
+    @Query("SELECT o FROM OffreStage o WHERE " +
+            "o.statut = 'VALIDEE' " +
+            "AND (o.dateExpiration IS NULL OR o.dateExpiration > CURRENT_DATE) " +
+            "AND (:search IS NULL OR :search = '' OR " +
+            "     LOWER(o.titre) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "     LOWER(o.description) LIKE LOWER(CONCAT('%', :search, '%'))) " +
+            "AND (:typeOffre IS NULL OR :typeOffre = '' OR o.typeOffre = :typeOffre) " +
+            "AND (:dateDebutMin IS NULL OR o.dateDebut >= :dateDebutMin) " +
+            "AND (:dateDebutMax IS NULL OR o.dateDebut <= :dateDebutMax)")
+    Page<OffreStage> findFilteredOffres(
+            @Param("search") String search,
+            @Param("typeOffre") TypeOffreEnum typeOffre,
+            @Param("dateDebutMin") LocalDate dateDebutMin,
+            @Param("dateDebutMax") LocalDate dateDebutMax,
+            Pageable pageable
+    );
 }

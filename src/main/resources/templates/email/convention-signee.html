@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Convention Signée</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #FF9800;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-top: none;
+        }
+        .footer {
+            text-align: center;
+            padding: 10px;
+            color: #666;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>✍️ Convention Signée</h1>
+    </div>
+    <div class="content">
+        <p>Bonjour <strong th:text="${nom}">Nom</strong>,</p>
+        
+        <p>La convention de stage a été signée par <strong th:text="${signataire}">Signataire</strong>.</p>
+        
+        <p><strong>Détails de la convention :</strong></p>
+        <ul>
+            <li><strong>Étudiant :</strong> <span th:text="${etudiantNom}">Nom Étudiant</span></li>
+            <li><strong>Entreprise :</strong> <span th:text="${entrepriseNom}">Nom Entreprise</span></li>
+        </ul>
+        
+        <p th:if="${statut == 'EN_ATTENTE_SIGNATURES'}">
+            La convention est toujours en attente d'autres signatures. Vous serez notifié une fois toutes les signatures collectées.
+        </p>
+        
+        <p>Cordialement,<br>
+        <strong>L'équipe Gestion de Stages</strong></p>
+    </div>
+    <div class="footer">
+        <p>Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>
+    </div>
+</body>
+</html>

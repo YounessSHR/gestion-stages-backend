@@ -1,12 +1,15 @@
 package com.gestionstages.controller;
 
+import com.gestionstages.model.dto.request.OffreFilterRequest;
 import com.gestionstages.model.dto.request.OffreRequest;
 import com.gestionstages.model.dto.response.OffreResponse;
+import com.gestionstages.model.dto.response.PageResponse;
 import com.gestionstages.service.OffreService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,12 +29,66 @@ public class OffreController {
 
     /**
      * GET /api/offres/publiques
-     * Retrieves all public offers (validated and non-expired).
+     * Retrieves public offers with pagination and filters.
      * Public endpoint - no authentication required.
      * 
-     * @return List of public offer responses
+     * Query parameters:
+     * - search: Search term (title/description)
+     * - typeOffre: STAGE or ALTERNANCE
+     * - dateDebutMin: Minimum start date (YYYY-MM-DD)
+     * - dateDebutMax: Maximum start date (YYYY-MM-DD)
+     * - sortBy: Field to sort by (datePublication, dateDebut, remuneration)
+     * - sortDirection: ASC or DESC
+     * - page: Page number (default: 0)
+     * - size: Page size (default: 10, max: 100)
+     * 
+     * @param filter Filter and pagination parameters
+     * @return Paginated response with filtered offers
      */
     @GetMapping("/publiques")
+    public ResponseEntity<PageResponse<OffreResponse>> getOffresPubliques(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String typeOffre,
+            @RequestParam(required = false) String dateDebutMin,
+            @RequestParam(required = false) String dateDebutMax,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection,
+            @RequestParam(required = false, defaultValue = "0") Integer page,
+            @RequestParam(required = false, defaultValue = "10") Integer size) {
+        
+        OffreFilterRequest filter = new OffreFilterRequest();
+        filter.setSearch(search);
+        filter.setTypeOffre(typeOffre);
+        if (dateDebutMin != null && !dateDebutMin.isEmpty()) {
+            try {
+                filter.setDateDebutMin(java.time.LocalDate.parse(dateDebutMin));
+            } catch (Exception e) {
+                // Invalid date, ignore
+            }
+        }
+        if (dateDebutMax != null && !dateDebutMax.isEmpty()) {
+            try {
+                filter.setDateDebutMax(java.time.LocalDate.parse(dateDebutMax));
+            } catch (Exception e) {
+                // Invalid date, ignore
+            }
+        }
+        filter.setSortBy(sortBy);
+        filter.setSortDirection(sortDirection);
+        filter.setPage(page);
+        filter.setSize(size);
+        
+        PageResponse<OffreResponse> result = offreService.getOffresPubliques(filter);
+        return ResponseEntity.ok(result);
+    }
+    
+    /**
+     * GET /api/offres/publiques/all
+     * Retrieves all public offers without pagination (for backward compatibility).
+     * @deprecated Use /publiques with pagination instead
+     */
+    @GetMapping("/publiques/all")
+    @Deprecated
     public ResponseEntity<List<OffreResponse>> getAllOffresPubliques() {
         List<OffreResponse> offres = offreService.getAllOffresPubliques();
         return ResponseEntity.ok(offres);
@@ -154,5 +211,36 @@ public class OffreController {
         }
         List<OffreResponse> offres = offreService.searchOffres(titre.trim());
         return ResponseEntity.ok(offres);
+    }
+
+    /**
+     * GET /api/offres/all
+     * Retrieves all offers (admin only).
+     * Includes all offers regardless of status.
+     * 
+     * @return List of all offer responses
+     */
+    @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMINISTRATION')")
+    public ResponseEntity<List<OffreResponse>> getAllOffres() {
+        List<OffreResponse> offres = offreService.getAllOffres();
+        return ResponseEntity.ok(offres);
+    }
+
+    /**
+     * POST /api/offres/marquer-expirees
+     * Marks expired offers as expired (RG06).
+     * Requires authentication - admin only.
+     * This can also be called automatically by a scheduler.
+     * 
+     * @return Success message
+     */
+    @PostMapping("/marquer-expirees")
+    @PreAuthorize("hasRole('ADMINISTRATION')")
+    public ResponseEntity<?> marquerOffresExpirees() {
+        offreService.marquerOffresExpirees();
+        return ResponseEntity.ok().body(new java.util.HashMap<String, String>() {{
+            put("message", "Offres expirées marquées avec succès (RG06)");
+        }});
     }
 }

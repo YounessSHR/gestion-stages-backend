@@ -8,6 +8,7 @@ import com.gestionstages.model.entity.Convention;
 import com.gestionstages.model.enums.StatutConventionEnum;
 import com.gestionstages.repository.ConventionRepository;
 import com.gestionstages.service.ConventionService;
+import com.gestionstages.service.EmailService;
 import com.gestionstages.service.PdfGeneratorService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,9 @@ public class ConventionServiceImpl implements ConventionService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private EmailService emailService;
 
     @Override
     @Transactional(readOnly = true)
@@ -89,6 +93,13 @@ public class ConventionServiceImpl implements ConventionService {
         updateConventionStatus(convention);
         
         Convention savedConvention = conventionRepository.save(convention);
+        
+        // Send email notification asynchronously (non-blocking)
+        emailService.sendConventionSignee(savedConvention, "l'étudiant");
+        if (savedConvention.getStatut() == StatutConventionEnum.SIGNEE) {
+            emailService.sendConventionComplete(savedConvention);
+        }
+        
         return convertToResponse(savedConvention);
     }
 
@@ -113,6 +124,13 @@ public class ConventionServiceImpl implements ConventionService {
         updateConventionStatus(convention);
         
         Convention savedConvention = conventionRepository.save(convention);
+        
+        // Send email notification asynchronously (non-blocking)
+        emailService.sendConventionSignee(savedConvention, "l'entreprise");
+        if (savedConvention.getStatut() == StatutConventionEnum.SIGNEE) {
+            emailService.sendConventionComplete(savedConvention);
+        }
+        
         return convertToResponse(savedConvention);
     }
 
@@ -132,6 +150,13 @@ public class ConventionServiceImpl implements ConventionService {
         updateConventionStatus(convention);
         
         Convention savedConvention = conventionRepository.save(convention);
+        
+        // Send email notification asynchronously (non-blocking)
+        emailService.sendConventionSignee(savedConvention, "l'administration");
+        if (savedConvention.getStatut() == StatutConventionEnum.SIGNEE) {
+            emailService.sendConventionComplete(savedConvention);
+        }
+        
         return convertToResponse(savedConvention);
     }
 

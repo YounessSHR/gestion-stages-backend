@@ -10,10 +10,12 @@ import com.gestionstages.model.entity.Convention;
 import com.gestionstages.model.entity.SuiviStage;
 import com.gestionstages.model.entity.Tuteur;
 import com.gestionstages.model.enums.EtatAvancementEnum;
+import com.gestionstages.model.enums.RoleEnum;
 import com.gestionstages.model.enums.StatutConventionEnum;
 import com.gestionstages.repository.ConventionRepository;
 import com.gestionstages.repository.SuiviStageRepository;
 import com.gestionstages.repository.TuteurRepository;
+import com.gestionstages.service.EmailService;
 import com.gestionstages.service.SuiviService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -44,6 +47,9 @@ public class SuiviServiceImpl implements SuiviService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private EmailService emailService;
+
     @Override
     @Transactional
     public SuiviStageResponse assignerTuteur(AssignTuteurRequest request) {
@@ -61,9 +67,18 @@ public class SuiviServiceImpl implements SuiviService {
             throw new BadRequestException("Cette convention a déjà un tuteur assigné");
         }
 
-        // Retrieve tutor
-        Tuteur tuteur = tuteurRepository.findById(request.getTuteurId())
-                .orElseThrow(() -> new ResourceNotFoundException("Tuteur non trouvé avec l'ID: " + request.getTuteurId()));
+        // Retrieve tutor - using findById with JOINED inheritance
+        // The ID is in the utilisateur table, and tuteur extends utilisateur
+        Optional<Tuteur> tuteurOpt = tuteurRepository.findById(request.getTuteurId());
+        if (tuteurOpt.isEmpty()) {
+            throw new ResourceNotFoundException("Tuteur non trouvé avec l'ID: " + request.getTuteurId());
+        }
+        Tuteur tuteur = tuteurOpt.get();
+        
+        // Verify that the user is actually a tutor (has TUTEUR role)
+        if (tuteur.getRole() != RoleEnum.TUTEUR) {
+            throw new BadRequestException("L'utilisateur avec l'ID " + request.getTuteurId() + " n'est pas un tuteur");
+        }
 
         // RG05: A tutor can follow max 10 students (active ones only)
         Long countActiveStudents = suiviStageRepository.countByTuteurEmailAndEtatAvancementNotTermine(tuteur.getEmail());
@@ -85,6 +100,10 @@ public class SuiviServiceImpl implements SuiviService {
         suiviStage.setEtatAvancement(EtatAvancementEnum.NON_COMMENCE);
 
         SuiviStage savedSuiviStage = suiviStageRepository.save(suiviStage);
+        
+        // Send email notification asynchronously (non-blocking)
+        emailService.sendTuteurAssigne(savedSuiviStage);
+        
         return convertToResponse(savedSuiviStage);
     }
 

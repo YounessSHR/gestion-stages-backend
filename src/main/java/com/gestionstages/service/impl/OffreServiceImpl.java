@@ -3,17 +3,25 @@ package com.gestionstages.service.impl;
 import com.gestionstages.exception.BadRequestException;
 import com.gestionstages.exception.ResourceNotFoundException;
 import com.gestionstages.exception.UnauthorizedException;
+import com.gestionstages.model.dto.request.OffreFilterRequest;
 import com.gestionstages.model.dto.request.OffreRequest;
 import com.gestionstages.model.dto.response.OffreResponse;
+import com.gestionstages.model.dto.response.PageResponse;
 import com.gestionstages.model.entity.Entreprise;
 import com.gestionstages.model.entity.OffreStage;
 import com.gestionstages.model.enums.StatutOffreEnum;
 import com.gestionstages.model.enums.TypeOffreEnum;
 import com.gestionstages.repository.EntrepriseRepository;
 import com.gestionstages.repository.OffreStageRepository;
+import com.gestionstages.service.EmailService;
+import com.gestionstages.service.NotificationService;
 import com.gestionstages.service.OffreService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,13 +46,77 @@ public class OffreServiceImpl implements OffreService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private NotificationService notificationService;
+
+    /**
+     * Retrieves public offers with pagination and filters.
+     * 
+     * @param filter Filter and pagination parameters
+     * @return Paginated response with filtered offers
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<OffreResponse> getOffresPubliques(OffreFilterRequest filter) {
+        // Prepare filter parameters
+        String search = (filter.getSearch() != null && !filter.getSearch().trim().isEmpty()) 
+                ? filter.getSearch().trim() : null;
+        TypeOffreEnum typeOffre = null;
+        if (filter.getTypeOffre() != null && !filter.getTypeOffre().trim().isEmpty()) {
+            try {
+                typeOffre = TypeOffreEnum.valueOf(filter.getTypeOffre().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                // Invalid type, ignore
+            }
+        }
+        
+        // Prepare sorting
+        Sort sort = Sort.by(Sort.Direction.DESC, "datePublication"); // Default sort
+        if (filter.getSortBy() != null && !filter.getSortBy().trim().isEmpty()) {
+            Sort.Direction direction = "ASC".equalsIgnoreCase(filter.getSortDirection()) 
+                    ? Sort.Direction.ASC : Sort.Direction.DESC;
+            sort = Sort.by(direction, filter.getSortBy());
+        }
+        
+        // Prepare pagination
+        int page = filter.getPage() != null && filter.getPage() >= 0 ? filter.getPage() : 0;
+        int size = filter.getSize() != null && filter.getSize() > 0 && filter.getSize() <= 100 
+                ? filter.getSize() : 10;
+        Pageable pageable = PageRequest.of(page, size, sort);
+        
+        // Query with filters
+        Page<OffreStage> pageResult = offreStageRepository.findFilteredOffres(
+                search, typeOffre, filter.getDateDebutMin(), filter.getDateDebutMax(), pageable
+        );
+        
+        // Convert to response
+        List<OffreResponse> content = pageResult.getContent().stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+        
+        return new PageResponse<>(
+                content,
+                pageResult.getNumber(),
+                pageResult.getSize(),
+                pageResult.getTotalElements(),
+                pageResult.getTotalPages(),
+                pageResult.isFirst(),
+                pageResult.isLast()
+        );
+    }
+
     /**
      * Retrieves all public offers (validated and not expired).
      * Only offers with status VALIDEE and expiration date in the future are returned.
      * 
      * @return List of public offer responses
+     * @deprecated Use getOffresPubliques(OffreFilterRequest) instead
      */
     @Override
+    @Deprecated
     @Transactional(readOnly = true)
     public List<OffreResponse> getAllOffresPubliques() {
         List<OffreStage> offres = offreStageRepository.findAllValidOffres();
@@ -238,6 +310,16 @@ public class OffreServiceImpl implements OffreService {
 
         offre.setStatut(StatutOffreEnum.VALIDEE);
         OffreStage updatedOffre = offreStageRepository.save(offre);
+        
+        // Send email and notification asynchronously (non-blocking)
+        emailService.sendOffreValidee(updatedOffre);
+        notificationService.creerNotification(
+                updatedOffre.getEntreprise().getId(),
+                "Votre offre '" + updatedOffre.getTitre() + "' a été validée et est maintenant visible.",
+                "OFFRE",
+                "/entreprise/offres"
+        );
+        
         return convertToResponse(updatedOffre);
     }
 
@@ -254,6 +336,21 @@ public class OffreServiceImpl implements OffreService {
                 .orElseThrow(() -> new ResourceNotFoundException("Entreprise non trouvée avec l'email: " + emailEntreprise));
 
         List<OffreStage> offres = offreStageRepository.findByEntreprise(entreprise);
+        return offres.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves all offers (admin only).
+     * Includes all offers regardless of status.
+     * 
+     * @return List of all offer responses
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<OffreResponse> getAllOffres() {
+        List<OffreStage> offres = offreStageRepository.findAll();
         return offres.stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
@@ -319,5 +416,30 @@ public class OffreServiceImpl implements OffreService {
         }
         
         return response;
+    }
+
+    /**
+     * RG06: Marque automatiquement les offres expirées.
+     * Une offre est considérée comme expirée si sa date d'expiration est passée.
+     * Les offres expirées ne sont plus consultables publiquement.
+     */
+    @Override
+    @Transactional
+    public void marquerOffresExpirees() {
+        LocalDate now = LocalDate.now();
+        List<OffreStage> offresValidees = offreStageRepository.findByStatut(StatutOffreEnum.VALIDEE);
+        
+        int countExpired = 0;
+        for (OffreStage offre : offresValidees) {
+            if (offre.getDateExpiration() != null && offre.getDateExpiration().isBefore(now)) {
+                offre.setStatut(StatutOffreEnum.EXPIREE);
+                offreStageRepository.save(offre);
+                countExpired++;
+            }
+        }
+        
+        if (countExpired > 0) {
+            System.out.println("RG06: " + countExpired + " offre(s) marquée(s) comme expirée(s)");
+        }
     }
 }

@@ -1,6 +1,7 @@
-# Gestion de Stages et Alternances - Backend
+# LinkUp - Backend
+## Plateforme de Gestion de Stages et Alternances
 
-Plateforme web pour la gestion complète des stages et alternances.
+Plateforme web complète pour la gestion des stages et alternances, développée avec Spring Boot et React.
 
 ## 🚀 Technologies
 
@@ -69,7 +70,6 @@ backend/
 │   └── templates/
 │       └── convention-template.html
 ├── postman_collection.json  # Postman collection for API testing
-├── POSTMAN_GUIDE.md         # Guide for using Postman collection
 └── pom.xml
 ```
 
@@ -144,14 +144,9 @@ A complete Postman collection is provided (`postman_collection.json`) with:
 - Automatic token management
 - Test scenarios for business rules (RG01, RG02, RG03, RG04, RG05, RG07)
 - Examples for all user roles (Student, Enterprise, Tutor, Administration)
+- End-to-end test workflows (8 complete scenarios)
 
-A complete test workflow JSON is provided (`TEST_WORKFLOW_SPRINT2.json`) with:
-- End-to-end test scenarios for Sprint 2
-- Step-by-step workflows
-- Business rules validation tests
-- Security and permissions tests
-
-See `POSTMAN_GUIDE.md` for detailed testing instructions.
+See `POSTMAN_COLLECTION_UNIFIED.md` for detailed testing instructions and workflow documentation.
 
 ## ✅ Sprint 2 - Completed
 
@@ -225,12 +220,78 @@ See `POSTMAN_GUIDE.md` for detailed testing instructions.
 
 **See `API_ENDPOINTS_SPRINT2.md` for complete API documentation.**
 
-## 🔄 Next Steps (Sprint 3)
+## ✅ Sprint 3 - Completed
 
-**Sprint 3 Features (Frontend):**
-- [ ] React frontend implementation
-- [ ] Integration with backend API
-- [ ] User interface for all roles
+### Features Implemented
+
+#### 1. User Profile Management
+- ✅ Get current user profile (`GET /api/users/me`)
+- ✅ Update user profile (`PUT /api/users/me`)
+- ✅ Password change functionality (`PUT /api/users/me/password`)
+- ✅ CV upload/download for students (`POST /api/cv/upload`, `GET /api/cv/download`)
+
+#### 2. Email Notification System
+- ✅ Email notifications for:
+  - Application accepted/rejected
+  - Offer validated/rejected
+  - Convention created and signed
+  - Tutor assigned
+- ✅ Thymeleaf templates for professional HTML emails
+- ✅ Asynchronous email sending (`@Async`) for better performance
+
+#### 3. Advanced Search and Filtering
+- ✅ Advanced filters for offers:
+  - Search by title/description/skills
+  - Filter by type, location, date range
+  - Filter by remuneration range
+  - Sort by various criteria (date, salary, etc.)
+- ✅ Dynamic query building with JPA `Specification`
+
+#### 4. Pagination
+- ✅ Backend pagination for offers (`Pageable` from Spring Data)
+- ✅ Frontend pagination controls
+- ✅ Configurable page size (default: 10 items per page)
+
+#### 5. In-App Notifications
+- ✅ Real-time notification system
+- ✅ Notification badge with unread count
+- ✅ Notification dropdown in navbar
+- ✅ Mark as read / Mark all as read
+- ✅ Auto-refresh every 30 seconds
+
+#### 6. Performance Optimizations
+- ✅ Asynchronous processing for emails and notifications
+- ✅ ThreadPoolTaskExecutor configuration
+- ✅ Non-blocking API responses
+
+#### 7. Additional Features
+- ✅ CV management (upload, download, view)
+- ✅ Improved PDF generation with professional design
+- ✅ Automatic marking of expired offers (RG06)
+- ✅ Archive functionality for conventions
+
+### API Endpoints (Sprint 3)
+
+#### User Profile
+- `GET /api/users/me` - Get current user profile (auth required)
+- `PUT /api/users/me` - Update current user profile (auth required)
+- `PUT /api/users/me/password` - Change password (auth required)
+
+#### CV Management
+- `POST /api/cv/upload` - Upload CV (Student, auth required)
+- `GET /api/cv/download` - Download CV (auth required)
+- `GET /api/cv/me` - Get my CV info (Student, auth required)
+
+#### Offers (Enhanced)
+- `GET /api/offres/publiques/filtered` - Get filtered and paginated offers (no auth required)
+  - Query parameters: `searchTerm`, `typeOffre`, `localisation`, `dateDebutMin`, `dateDebutMax`, `remunerationMin`, `remunerationMax`, `sortBy`, `sortOrder`, `page`, `size`
+
+#### Notifications
+- `GET /api/notifications` - Get all notifications (auth required)
+- `GET /api/notifications/page` - Get paginated notifications (auth required)
+- `GET /api/notifications/count` - Get unread count (auth required)
+- `PUT /api/notifications/{id}/lu` - Mark as read (auth required)
+- `PUT /api/notifications/toutes-lues` - Mark all as read (auth required)
 
 ## 📊 Database
 
@@ -260,13 +321,13 @@ The database schema is automatically created by Hibernate (`ddl-auto=update`).
 
 - `SETUP.md` - Setup instructions
 - `SECURITY.md` - Security guidelines
-- `POSTMAN_GUIDE.md` - Postman testing guide
-- `SPRINT2_PLAN.md` - Sprint 2 implementation plan
-- `SPRINT2_VERIFICATION_REPORT.md` - Sprint 2 verification report
-- `API_ENDPOINTS_SPRINT2.md` - Complete API documentation for Sprint 2
-- `TEST_WORKFLOW_SPRINT2.json` - Complete test workflow for Sprint 2
-- `CONCEPTION.md` - Project conception
+- `DEMO_WORKFLOW.md` - **Guide de démonstration complet pour présentation**
+- `TESTING_WORKFLOW.md` - Complete testing workflow guide
+- `QUICK_TEST_GUIDE.md` - Quick testing guide
+- `POSTMAN_COLLECTION_UNIFIED.md` - Postman collection guide and workflows
+- `CONCEPTION.md` - Project conception and business rules
 - `ARCHITECTURE.md` - System architecture
+- `HELP.md` - Getting started reference
 
 ## 👥 Équipe
 
